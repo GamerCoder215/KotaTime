@@ -29,6 +29,15 @@ jobs:
           cache: 'gradle'
       - name: Change Permissions
         run: chmod +x ./gradlew
+      - name: Generate Secrets
+        uses: SpicyPizza/create-envfile@v2
+        with:
+          envkey_APP_ID: ${{ secrets.APP_ID }}
+          envkey_APP_SECRET: ${{ secrets.APP_SECRET }}
+
+          envkey_SERVER_PORT: ${{ vars.SERVER_PORT }}
+
+          directory: src/main/resources/assets
       - name: Build Project
         run: ./gradlew clean build
       - name: Upload Artifacts
