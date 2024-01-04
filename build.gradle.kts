@@ -1,3 +1,4 @@
+import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -18,6 +19,36 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+}
+
+val os = System.getProperty("os.name").lowercase().split(" ")[0]
+val jdk = JavaVersion.VERSION_21
+
+tasks {
+    build {
+        dependsOn("release")
+    }
+
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = jdk.toString()
+        }
+    }
+
+    processResources {
+        include(".env")
+        include("assets/**/*")
+    }
+
+    register("release", Zip::class) {
+        dependsOn("createReleaseDistributable")
+
+        from("build/compose/binaries/main-release/app/KotaTime")
+        archiveFileName.set("KotaTime-$version-$os.zip")
+    }
 }
 
 compose.desktop {
@@ -28,11 +59,23 @@ compose.desktop {
             targetFormats(
                 TargetFormat.Exe,
                 TargetFormat.Pkg,
-                TargetFormat.Deb,
-                TargetFormat.AppImage
+                TargetFormat.Deb
             )
+
             packageName = "KotaTime"
             packageVersion = version.toString()
+
+            windows {
+                iconFile.set(file("src/main/resources/assets/icon/icon128.ico"))
+            }
+
+            macOS {
+                iconFile.set(file("src/main/resources/assets/icon/icon128.icns"))
+            }
+
+            linux {
+                iconFile.set(file("src/main/resources/assets/icon/icon128.png"))
+            }
         }
     }
 }
