@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import me.gamercoder215.kotatime.server.start
 import org.jetbrains.skia.Image
 
 @Composable
@@ -26,4 +27,6 @@ fun main() = application {
     ) {
         App()
     }
+
+    start()
 }

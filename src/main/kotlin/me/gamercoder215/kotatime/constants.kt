@@ -13,6 +13,8 @@ object Env {
 
     private val dotenv: Dotenv = dotenv()
 
+    val SERVER_PORT: Int = this["SERVER_PORT"].toInt()
+
     operator fun get(key: String): String = dotenv.get(key)
 
 }
