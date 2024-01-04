@@ -25,7 +25,7 @@ dependencies {
 }
 
 val os = System.getProperty("os.name").lowercase().split(" ")[0]
-val jdk = JavaVersion.VERSION_21
+val jdk = JavaVersion.VERSION_17
 
 java {
     sourceCompatibility = jdk
