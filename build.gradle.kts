@@ -27,6 +27,11 @@ dependencies {
 val os = System.getProperty("os.name").lowercase().split(" ")[0]
 val jdk = JavaVersion.VERSION_21
 
+java {
+    sourceCompatibility = jdk
+    targetCompatibility = jdk
+}
+
 tasks {
     build {
         dependsOn("release")
