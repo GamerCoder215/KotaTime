@@ -22,6 +22,8 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+    implementation("io.javalin:javalin:5.6.3")
+    implementation("org.slf4j:slf4j-simple:2.0.10")
 }
 
 val os = System.getProperty("os.name").lowercase().split(" ")[0]
@@ -51,7 +53,7 @@ tasks {
     register("release", Zip::class) {
         dependsOn("createReleaseDistributable")
 
-        from("build/compose/binaries/main-release/app/KotaTime")
+        from("${layout.buildDirectory.get()}/compose/binaries/main-release/app/")
         archiveFileName.set("KotaTime-$version-$os.zip")
     }
 }
