@@ -57,7 +57,7 @@ jobs:
           - os: ubuntu-latest
             prefix: ./
           - os: windows-latest
-            prefix: ""
+            prefix: .\
           - os: macos-latest
             prefix: ./
 
