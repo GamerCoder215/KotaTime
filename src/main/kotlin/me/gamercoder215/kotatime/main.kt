@@ -1,20 +1,24 @@
 package me.gamercoder215.kotatime
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import io.kanro.compose.jetbrains.expui.control.Icon
-import io.kanro.compose.jetbrains.expui.control.ToolBarActionButton
-import io.kanro.compose.jetbrains.expui.style.LocalErrorAreaColors
+import me.gamercoder215.kotatime.ui.invalidAPIKey
+import me.gamercoder215.kotatime.ui.noAPIKey
+
+const val EXAMPLE_CONFIG = "[settings]\napi_key = YOUR_WAKATIME_API_KEY"
 
 @Composable
 fun App() {
+    if (API_KEY == null)
+        return noAPIKey()
 
+    if (!VALID_API_KEY)
+        return invalidAPIKey()
+
+    println(API_KEY)
 }
 
 fun main() = application {
