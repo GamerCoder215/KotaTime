@@ -18,12 +18,12 @@ repositories {
 }
 
 dependencies {
-    implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.currentOs) {
+        exclude("org.jetbrains.compose.material")
+    }
+    implementation("com.bybutter.compose:compose-jetbrains-expui-theme:2.0.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
-    implementation("io.javalin:javalin:5.6.3")
-    implementation("org.slf4j:slf4j-simple:2.0.10")
 }
 
 val os = System.getProperty("os.name").lowercase().split(" ")[0]
@@ -61,16 +61,31 @@ tasks {
 compose.desktop {
     application {
         mainClass = "me.gamercoder215.kotatime.MainKt"
+        buildTypes.release.proguard {
+            isEnabled = false
+        }
 
         nativeDistributions {
+            modules(
+                "java.instrument",
+                "java.management",
+                "java.naming",
+                "java.net.http",
+                "java.security.jgss",
+                "java.sql",
+                "jdk.unsupported"
+            )
+
             targetFormats(
                 TargetFormat.Exe,
                 TargetFormat.Pkg,
                 TargetFormat.Deb
             )
 
-            packageName = "KotaTime"
-            packageVersion = version.toString()
+            description = "A desktop app for WakaTime"
+            copyright = "Copyright (c) GamerCoder 2024-Latest. All rights reserved."
+            vendor = "GamerCoder"
+            licenseFile.set(project.file("LICENSE"))
 
             windows {
                 iconFile.set(file("src/main/resources/assets/icon/icon128.ico"))
