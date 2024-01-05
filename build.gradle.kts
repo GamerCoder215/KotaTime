@@ -21,7 +21,7 @@ dependencies {
     implementation(compose.desktop.currentOs) {
         exclude("org.jetbrains.compose.material")
     }
-    implementation("com.bybutter.compose:compose-jetbrains-expui-theme:2.0.0")
+    implementation("com.bybutter.compose:compose-jetbrains-expui-theme:2.2.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 }
