@@ -1,5 +1,7 @@
 package me.gamercoder215.kotatime
 
+import kotlinx.serialization.json.Json
+import me.gamercoder215.kotatime.storage.USER_URL
 import java.io.File
 import java.net.URI
 import java.net.http.HttpClient
@@ -7,17 +9,21 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.file.FileSystems
 
-val SEPARATOR: String
-    get() = FileSystems.getDefault().separator
-val WAKATIME_FILE = File("${System.getProperty("user.home")}$SEPARATOR.wakatime.cfg")
+val WAKATIME_FILE = File("${System.getProperty("user.home")}${File.separator}.wakatime.cfg")
 
 const val NAME = "KotaTime"
 const val VERSION = "1.0.0"
 const val ICON_URL = "assets/icon/icon128.png"
+val USER_AGENT = "$NAME/$VERSION ${System.getProperty("os.name")} ${System.getProperty("os.version")} ${System.getProperty("os.arch")} (Java ${System.getProperty("java.version")})"
 
 val client: HttpClient = HttpClient.newBuilder()
     .version(HttpClient.Version.HTTP_2)
     .build()
+
+val json = Json {
+    isLenient = true
+    prettyPrint = true
+}
 
 // API
 
@@ -36,14 +42,13 @@ val VALID_API_KEY: Boolean
     get() {
         if (API_KEY == null) return false
 
-        val res = client.send(HttpRequest.newBuilder()
-            .uri(URI.create(USER_URL))
-            .GET()
-            .build(), HttpResponse.BodyHandlers.ofString())
+        val res = client.send(
+            HttpRequest.newBuilder()
+                .uri(URI.create(USER_URL))
+                .GET()
+                .header("User-Agent", USER_AGENT)
+                .build(), HttpResponse.BodyHandlers.ofString()
+        )
 
         return res.statusCode() != 401
     }
-
-// URLs
-
-val USER_URL = "https://wakatime.com/api/user/current?api_key=$API_KEY"
