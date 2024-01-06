@@ -68,11 +68,7 @@ compose.desktop {
         nativeDistributions {
             modules(
                 "java.instrument",
-                "java.management",
-                "java.naming",
                 "java.net.http",
-                "java.security.jgss",
-                "java.sql",
                 "jdk.unsupported"
             )
 
