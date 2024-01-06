@@ -24,6 +24,10 @@ dependencies {
     implementation("com.bybutter.compose:compose-jetbrains-expui-theme:2.2.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+
+    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
+    testImplementation(kotlin("test"))
 }
 
 val os = System.getProperty("os.name").lowercase().split(" ")[0]
@@ -37,6 +41,10 @@ java {
 tasks {
     build {
         dependsOn("release")
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
     compileKotlin {
