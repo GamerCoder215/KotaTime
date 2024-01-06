@@ -1,5 +1,6 @@
 package me.gamercoder215.kotatime.ui
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,67 +16,92 @@ import io.kanro.compose.jetbrains.expui.control.Label
 import io.kanro.compose.jetbrains.expui.control.TextArea
 import me.gamercoder215.kotatime.EXAMPLE_CONFIG
 import me.gamercoder215.kotatime.WAKATIME_FILE
+import me.gamercoder215.kotatime.util.mediumSpacer
+import me.gamercoder215.kotatime.util.smallSpacer
 import java.awt.Desktop
 import java.net.URI
 
 const val API_KEY_URL = "https://wakatime.com/api-key"
 
 @Composable
+private fun template(
+    title: String,
+    message: String,
+    extra: @Composable ColumnScope.() -> Unit = {}
+) {
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        mediumSpacer()
+
+        Icon("assets/svg/warning.svg")
+        Label(title, style = TextStyle(fontWeight = FontWeight.Bold, fontSize = TextUnit(20f, TextUnitType.Sp)))
+
+        smallSpacer()
+        Label(message)
+
+        extra()
+    }
+}
+
+@Composable
+private fun apiFileExample() {
+    smallSpacer()
+    Label("Example File:")
+
+    mediumSpacer()
+    TextArea(EXAMPLE_CONFIG, onValueChange = {}, readOnly = true, modifier = Modifier.fillMaxWidth(fraction = 0.8F).height(100.dp))
+
+    smallSpacer()
+    Row {
+        Label("View your API Key at ")
+        ExternalLink(API_KEY_URL, onClick = { Desktop.getDesktop().browse(URI.create(API_KEY_URL)) })
+    }
+}
+
+@Composable
+@Preview
 fun noAPIKey() {
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.size(24.dp))
-
-        Icon("assets/svg/warning.svg")
-        Label("No API key found!", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = TextUnit(20f, TextUnitType.Sp)))
-
-        Spacer(Modifier.size(14.dp))
-        Label("Please add your API key to \"${WAKATIME_FILE.absolutePath}\" and restart the app.")
-
-        Spacer(Modifier.size(14.dp))
-        Label("Example File:")
-
-        Spacer(Modifier.size(28.dp))
-
-        TextArea(EXAMPLE_CONFIG, onValueChange = {}, readOnly = true, modifier = Modifier.fillMaxWidth(fraction = 0.8F).height(100.dp))
-
-        Spacer(Modifier.size(14.dp))
-        Row {
-            Label("View your API Key at ")
-            ExternalLink(API_KEY_URL, onClick = { Desktop.getDesktop().browse(URI.create(API_KEY_URL)) })
-        }
+        template(
+            "No API key found!",
+            "Please add your API key to \"${WAKATIME_FILE.absolutePath}\" and restart the app.",
+        ) { apiFileExample() }
     }
 }
 
 @Composable
+@Preview
 fun invalidAPIKey() {
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.size(24.dp))
-
-        Icon("assets/svg/warning.svg")
-        Label("Invalid API Key", fontWeight = FontWeight.Bold, fontSize = TextUnit(20f, TextUnitType.Sp))
-
-        Spacer(Modifier.size(14.dp))
-        Label("Please add a valid API key to \"${WAKATIME_FILE.absolutePath}\" and restart the app.")
-
-        Spacer(Modifier.size(14.dp))
-        Label("Example Valid File:")
-
-        Spacer(Modifier.size(28.dp))
-        TextArea(EXAMPLE_CONFIG, onValueChange = {}, readOnly = true, modifier = Modifier.fillMaxWidth(fraction = 0.8F).height(100.dp))
-
-        Spacer(Modifier.size(14.dp))
-        Row {
-            Label("View your API Key at ")
-            ExternalLink(API_KEY_URL, onClick = { Desktop.getDesktop().browse(URI.create(API_KEY_URL)) })
-        }
+        template(
+            "Invalid API key!",
+            "Please add a valid API key to \"${WAKATIME_FILE.absolutePath}\" and restart the app.",
+        ) { apiFileExample() }
     }
 }
 
+@Composable
+@Preview
+fun offline() {
+    Column(
+        Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        template(
+            "Offline!",
+            "KotaTime does not currently have any saved data to display. Please connect to the internet and restart the app. Additionally, check that WakaTime isn't down."
+        )
+    }
+}
