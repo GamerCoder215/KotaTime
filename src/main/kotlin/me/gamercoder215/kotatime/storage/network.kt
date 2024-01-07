@@ -1,17 +1,13 @@
 package me.gamercoder215.kotatime.storage
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.*
 import me.gamercoder215.kotatime.API_KEY
 import me.gamercoder215.kotatime.USER_AGENT
 import me.gamercoder215.kotatime.client
 import me.gamercoder215.kotatime.json
-import me.gamercoder215.kotatime.util.asDate
-import me.gamercoder215.kotatime.util.load
+import me.gamercoder215.kotatime.util.*
 import java.lang.reflect.Modifier
 import java.net.NetworkInterface
 import java.net.URI
@@ -78,7 +74,15 @@ fun getStatFilters(start: Date, now: Date = Date()): List<String> {
 
 suspend fun loadWakatimeDataFromNetwork() = withContext(Dispatchers.IO) {
     launch {
-        StorageManager.languages.addAll(loadArray(baseUrl = "https://wakatime.com/api/v1/program_languages", clazz = Language::class.java))
+        val languages = loadArray(baseUrl = "https://wakatime.com/api/v1/users/current/stats", clazz = Language::class.java, entryPoint = "data.languages")
+            .onEach { l ->
+                val wl = WLanguage.byName(l.name)
+                l.color = wl?.color ?: 0xffffff
+            }
+
+        StorageManager.languages.addAll(languages)
+
+        info("Loaded ${StorageManager.languages.size} WakaTime Languages")
     }
 }
 
@@ -86,43 +90,52 @@ suspend fun loadFromNetwork() = withContext(Dispatchers.IO) {
     launch {
         loadObj(baseUrl = "https://wakatime.com/api/v1/users/current", clazz = WUser::class.java)
         loadObj(baseUrl = "https://wakatime.com/api/v1/users/current/all_time_since_today", clazz = TimeSinceToday::class.java)
+        StorageManager.savePhoto()
+
+        info("Loaded user data for ${WUser.username}")
     }.join()
 
-    launch {
+    coroutineScope {
         StorageManager.machines.addAll(loadArray(baseUrl = "https://wakatime.com/api/v1/users/current/machine_names", clazz = Machine::class.java))
+
+        info("Loaded machine data for ${WUser.username}")
     }
 
-    launch {
+    coroutineScope {
         val globalJson = json("https://wakatime.com/api/v1/leaders?&api_key=$API_KEY")["current_user"] as? JsonObject ?: throw SerializationException("Invalid entry point (parent is null): current_user")
         val global = Rank().load(globalJson)
         StorageManager.ranks.add(global)
+        info("Loaded Global Rank for ${WUser.username}")
 
         for (lang in StorageManager.languages)
-            async {
+            launch {
+                delay(100L)
                 val rank = json("https://wakatime.com/api/v1/leaders?&api_key=$API_KEY&language=${lang.name.replace(" ", "%20")}")
-                if (rank["error"] != null) return@async
+                if (rank["error"] != null) return@launch
 
                 val data = rank["current_user"] as? JsonObject ?: throw SerializationException("Invalid entry point (parent is null): data")
-                if (data.isEmpty()) return@async
-                if (data["page"] is JsonNull) return@async
+                if (data.isEmpty()) return@launch
+                if (data["page"] is JsonNull) return@launch
 
                 val obj = Rank().load(data)
                 obj.language = lang.name
 
                 StorageManager.ranks.add(obj)
-            }.await()
+                info("Loaded Rank for ${WUser.username} in '${lang.name}'")
+            }
     }
 
-    launch {
+    coroutineScope {
         val json = json("https://wakatime.com/api/v1/users/current/projects?api_key=$API_KEY")
         val data = json["data"] as? JsonArray ?: throw SerializationException("Invalid entry point (parent is null): data")
-        if (data.isEmpty()) return@launch
+        if (data.isEmpty()) return@coroutineScope warn("No projects found for ${WUser.username}")
 
         val projects = loadArray(loaded = json, clazz = Project::class.java)
-            .onEach { p ->
-                async {
+            .onEachIndexed { i, p ->
+                launch {
+                    delay(100L * i)
                     val commitsJson = json("https://wakatime.com/api/v1/users/current/projects/${p.id}/commits?api_key=$API_KEY")
-                    if (commitsJson["error"] != null) return@async
+                    if (commitsJson["error"] != null) return@launch
 
                     val commits = CommitData().load(commitsJson).apply {
                         val commits = mutableSetOf<Commit>()
@@ -138,18 +151,20 @@ suspend fun loadFromNetwork() = withContext(Dispatchers.IO) {
                     }
 
                     StorageManager.commits[p.id] = commits
-                }.await()
+                    info("Loaded ${commits.commits.size} commits for '${p.name}'")
+                }
 
-                async {
-                    val repo = data.firstOrNull { it.jsonObject["id"]?.jsonPrimitive?.contentOrNull == p.id }?.jsonObject?.get("repository") as? JsonObject ?: return@async
+                launch {
+                    val repo = data.firstOrNull { it.jsonObject["id"]?.jsonPrimitive?.contentOrNull == p.id }?.jsonObject?.get("repository") as? JsonObject ?: return@launch
                     p.repository = ProjectRepository().load(repo)
-                }.await()
+                    info("Added Git Repository for '${p.name}'")
+                }
             }
 
         StorageManager.projects.addAll(projects)
     }
 
-    launch {
+    coroutineScope {
         val stats = mutableMapOf<String, Stats>()
 
         val times = listOf(
@@ -159,9 +174,11 @@ suspend fun loadFromNetwork() = withContext(Dispatchers.IO) {
             "last_year",
             "all_time"
         ) + getStatFilters(WUser.created_at.asDate)
+        debug("${times.size} time filters: $times")
 
-        for (time in times) {
-            async {
+        for ((i, time) in times.withIndex())
+            launch {
+                delay(100L * i)
                 val infoJson = json("https://wakatime.com/api/v1/users/current/stats/$time?api_key=$API_KEY")
                 val info = StatsInfo().load(infoJson)
 
@@ -171,8 +188,9 @@ suspend fun loadFromNetwork() = withContext(Dispatchers.IO) {
                 val os = loadArray(baseUrl = "https://wakatime.com/api/v1/users/current/stats/$time", clazz = Stat::class.java, entryPoint = "data.operating_systems")
 
                 stats[time] = Stats(info, editors, categories, languages, os)
-            }.await()
-        }
+
+                info("Loaded Stats for ${WUser.username} in '$time'")
+            }
 
         StorageManager.loadedStats.putAll(stats)
     }
@@ -191,7 +209,13 @@ private fun json(
         HttpResponse.BodyHandlers.ofString()
     )
 
-    return json.parseToJsonElement(res.body()).jsonObject
+    val body = res.body()
+    debug("Request to $uri returned ${res.statusCode()}, size ${body.length}")
+
+    if (res.statusCode() == 302 || res.statusCode() == 429)
+        throw IllegalStateException("We are currently making too many API Requests. Wait about 5 minutes then re-open the application.")
+
+    return json.parseToJsonElement(body).jsonObject
 }
 
 private fun <T> loadObj(
