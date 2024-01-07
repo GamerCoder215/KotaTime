@@ -14,6 +14,10 @@ val WAKATIME_FILE = File("${System.getProperty("user.home")}${File.separator}.wa
 const val NAME = "KotaTime"
 const val VERSION = "1.0.0"
 const val ICON_URL = "assets/icon/icon128.png"
+
+const val GITHUB_URL = "https://github.com/GamerCoder215/KotaTime"
+const val WAKATIME_URL = "https://wakatime.com"
+
 val USER_AGENT = "$NAME/$VERSION ${System.getProperty("os.name")} ${System.getProperty("os.version")} ${System.getProperty("os.arch")} (Java ${System.getProperty("java.version")})"
 
 val client: HttpClient = HttpClient.newBuilder()
