@@ -13,7 +13,7 @@ import kotlin.properties.Delegates
 
 class Language : Serializable {
     var name = "Unknown"
-    var color = "#000000"
+    var color: Int = 0xffffff
 
     companion object {
         @Serial
@@ -24,6 +24,7 @@ class Language : Serializable {
 // WakaTime User Data
 
 object WUser {
+    var username = "Unknown"
     var bio = ""
     var created_at = "1970-01-01T00:00:00Z"
     var modified_at = "1970-01-01T00:00:00Z"
