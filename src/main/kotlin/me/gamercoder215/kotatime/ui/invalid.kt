@@ -16,8 +16,6 @@ import io.kanro.compose.jetbrains.expui.control.Label
 import io.kanro.compose.jetbrains.expui.control.TextArea
 import me.gamercoder215.kotatime.EXAMPLE_CONFIG
 import me.gamercoder215.kotatime.WAKATIME_FILE
-import me.gamercoder215.kotatime.util.mediumSpacer
-import me.gamercoder215.kotatime.util.smallSpacer
 import java.awt.Desktop
 import java.net.URI
 
