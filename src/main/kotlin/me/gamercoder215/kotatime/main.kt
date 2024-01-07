@@ -1,20 +1,65 @@
 package me.gamercoder215.kotatime
 
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import io.kanro.compose.jetbrains.expui.control.Label
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import me.gamercoder215.kotatime.storage.IS_ONLINE
 import me.gamercoder215.kotatime.storage.StorageManager
-import me.gamercoder215.kotatime.ui.invalidAPIKey
-import me.gamercoder215.kotatime.ui.noAPIKey
-import me.gamercoder215.kotatime.ui.offline
+import me.gamercoder215.kotatime.storage.StorageManager.saveGlobalData
+import me.gamercoder215.kotatime.storage.loadFromNetwork
+import me.gamercoder215.kotatime.storage.loadWakatimeDataFromNetwork
+import me.gamercoder215.kotatime.ui.*
+import me.gamercoder215.kotatime.ui.user.toolbar
+import me.gamercoder215.kotatime.ui.user.user
+import me.gamercoder215.kotatime.util.info
 
 const val EXAMPLE_CONFIG = "[settings]\napi_key = YOUR_WAKATIME_API_KEY"
 
+suspend fun loadData(whenDone: () -> Unit = {}) = runBlocking(Dispatchers.IO) {
+    if (API_KEY == null) return@runBlocking
+
+    val job1 = launch {
+        if (StorageManager.isGlobalEmpty) {
+            loadWakatimeDataFromNetwork()
+            saveGlobalData()
+        } else
+            StorageManager.loadGlobalData()
+    }
+
+    val job2 = launch {
+        if (StorageManager.isEmpty) {
+            loadFromNetwork()
+            StorageManager.save()
+        }
+
+        StorageManager.savePhoto()
+    }
+
+    job1.join()
+    job2.join()
+
+    withContext(Dispatchers.Default) {
+        whenDone()
+    }
+}
+
 @Composable
-fun App() {
+fun FrameWindowScope.App() {
     if (API_KEY == null)
         return noAPIKey()
 
@@ -23,15 +68,36 @@ fun App() {
 
     if (!VALID_API_KEY)
         return invalidAPIKey()
+
+    var loaded by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        loadData {
+            loaded = true
+        }
+    }
+
+    if (!loaded) {
+        Column(
+            Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            largeSpacer()
+            InfiniteProgressBar()
+            Label("Loading data...")
+        }
+
+        return
+    }
+
+    // UI Load
+
+    toolbar()
+    user()
 }
 
 fun main() = application {
-    var loaded by remember { mutableStateOf(true) }
-
-    LaunchedEffect(Unit) {
-        // loadData()
-        loaded = true
-    }
+    info("Starting $NAME v$VERSION")
 
     Window(
         title = NAME,
@@ -40,6 +106,5 @@ fun main() = application {
     ) {
         App()
     }
-
 
 }
