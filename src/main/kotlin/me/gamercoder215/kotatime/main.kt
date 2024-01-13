@@ -1,10 +1,8 @@
 package me.gamercoder215.kotatime
 
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,6 +12,8 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.kanro.compose.jetbrains.expui.control.Label
+import io.kanro.compose.jetbrains.expui.theme.DarkTheme
+import io.kanro.compose.jetbrains.expui.theme.LightTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -30,8 +30,8 @@ import me.gamercoder215.kotatime.util.info
 
 const val EXAMPLE_CONFIG = "[settings]\napi_key = YOUR_WAKATIME_API_KEY"
 
-suspend fun loadData(whenDone: () -> Unit = {}) = runBlocking(Dispatchers.IO) {
-    if (API_KEY == null) return@runBlocking
+suspend fun loadData(whenDone: () -> Unit = {}) = withContext(Dispatchers.IO) {
+    if (API_KEY == null) return@withContext
 
     val job1 = launch {
         if (StorageManager.isGlobalEmpty) {
@@ -47,7 +47,7 @@ suspend fun loadData(whenDone: () -> Unit = {}) = runBlocking(Dispatchers.IO) {
             StorageManager.save()
         }
 
-        StorageManager.savePhoto()
+        StorageManager.load()
     }
 
     job1.join()
@@ -84,7 +84,7 @@ fun FrameWindowScope.App() {
         ) {
             largeSpacer()
             InfiniteProgressBar()
-            Label("Loading data...")
+            Label("Loading Data...")
         }
 
         return
@@ -92,19 +92,30 @@ fun FrameWindowScope.App() {
 
     // UI Load
 
-    toolbar()
-    user()
+    Box(
+        Modifier.fillMaxSize().background(if (darkMode) DARK_BACKGROUND else LIGHT_BACKGROUND),
+        Alignment.TopStart
+    ) {
+        toolbar()
+        user()
+    }
 }
 
-fun main() = application {
+var recompose: () -> Unit = {}
+
+fun main() {
     info("Starting $NAME v$VERSION")
 
-    Window(
-        title = NAME,
-        icon = painterResource(ICON_URL),
-        onCloseRequest = ::exitApplication
-    ) {
-        App()
-    }
+    application {
+        val (trigger, triggerRecompose) = remember { mutableStateOf(true) }
+        recompose = { triggerRecompose(!trigger) }
 
+        Window(
+            title = NAME,
+            icon = painterResource(ICON_URL),
+            onCloseRequest = ::exitApplication
+        ) {
+            App()
+        }
+    }
 }
