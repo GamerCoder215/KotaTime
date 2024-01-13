@@ -176,17 +176,17 @@ object StorageManager {
         TimeSinceToday.fromJson(json.decodeFromString(timeSinceToday.readText()))
 
         // Machines
-        val machs = File(folder, "machines.dat")
+        val machs = File(user, "machines.dat")
         if (!machs.exists()) machs.createNewFile()
         machines.addAll(machs.deserialize<Set<Machine>>() ?: emptySet())
 
         // Ranks
-        val rank = File(folder, "ranks.dat")
+        val rank = File(user, "ranks.dat")
         if (!rank.exists()) rank.createNewFile()
         ranks.addAll(rank.deserialize<Set<Rank>>() ?: emptySet())
 
         // Projects
-        val projects = File(folder, "projects")
+        val projects = File(user, "projects")
         if (!projects.exists()) projects.mkdirs()
         for (projFile in projects.listFiles() ?: emptyArray()) {
             val proj = File(projFile, "data.dat")
@@ -200,7 +200,7 @@ object StorageManager {
         }
 
         // Stats
-        val stats = File(folder, "stats")
+        val stats = File(user, "stats")
         if (!stats.exists()) stats.mkdirs()
         for (statFile in stats.listFiles() ?: emptyArray()) {
             val stat = statFile.deserialize<Stats>() ?: continue
