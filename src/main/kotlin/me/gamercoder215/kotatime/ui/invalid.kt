@@ -34,7 +34,7 @@ private fun template(
     ) {
         mediumSpacer()
 
-        Icon("assets/svg/warning.svg")
+        Icon(themedPainterResource("assets/svg/warning.svg", "assets/svg/warning_dark.svg"))
         Label(title, style = TextStyle(fontWeight = FontWeight.Bold, fontSize = TextUnit(20f, TextUnitType.Sp)))
 
         smallSpacer()
