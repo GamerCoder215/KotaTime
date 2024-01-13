@@ -23,7 +23,6 @@ dependencies {
     }
     implementation("com.bybutter.compose:compose-jetbrains-expui-theme:2.2.0")
 
-
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     implementation("org.slf4j:slf4j-api:2.0.10")
     implementation("org.slf4j:slf4j-simple:2.0.10")
