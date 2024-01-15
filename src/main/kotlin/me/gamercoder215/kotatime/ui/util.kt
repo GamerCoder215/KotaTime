@@ -7,12 +7,15 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.kanro.compose.jetbrains.expui.control.ProgressBar
+import me.gamercoder215.kotatime.window
 import org.jetbrains.skia.Image
 import java.io.File
 
@@ -43,6 +46,12 @@ fun InfiniteProgressBar() {
 }
 
 // Extensions
+
+val Number.vh: Dp
+    get() = (window.height * (this.toFloat() / 100F)).dp
+
+val Number.vw: Dp
+    get() = (window.width * (this.toFloat() / 100F)).dp
 
 val Number.withAlpha: Long
     get() {
