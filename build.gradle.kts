@@ -27,7 +27,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.11")
     implementation("org.slf4j:slf4j-api:2.0.11")
 
-    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.mockito:mockito-core:5.9.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
     testImplementation(kotlin("test"))
 }
