@@ -1,22 +1,21 @@
 package me.gamercoder215.kotatime
 
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.kanro.compose.jetbrains.expui.control.Label
-import io.kanro.compose.jetbrains.expui.theme.DarkTheme
-import io.kanro.compose.jetbrains.expui.theme.LightTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.gamercoder215.kotatime.storage.IS_ONLINE
 import me.gamercoder215.kotatime.storage.StorageManager
@@ -27,6 +26,8 @@ import me.gamercoder215.kotatime.ui.*
 import me.gamercoder215.kotatime.ui.user.toolbar
 import me.gamercoder215.kotatime.ui.user.user
 import me.gamercoder215.kotatime.util.info
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 
 const val EXAMPLE_CONFIG = "[settings]\napi_key = YOUR_WAKATIME_API_KEY"
 
@@ -102,6 +103,7 @@ fun FrameWindowScope.App() {
 }
 
 var recompose: () -> Unit = {}
+lateinit var window: ComposeWindow
 
 fun main() {
     info("Starting $NAME v$VERSION")
@@ -115,6 +117,12 @@ fun main() {
             icon = painterResource(ICON_URL),
             onCloseRequest = ::exitApplication
         ) {
+            me.gamercoder215.kotatime.window = window
+
+            window.addComponentListener(object : ComponentAdapter() {
+                override fun componentResized(e: ComponentEvent) = recompose()
+            })
+
             App()
         }
     }
