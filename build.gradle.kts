@@ -25,7 +25,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     implementation("org.slf4j:slf4j-simple:2.0.11")
-    implementation("org.slf4j:slf4j-api:2.0.11")
+    implementation("org.slf4j:slf4j-api:2.0.12")
 
     testImplementation("org.mockito:mockito-core:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.1")
