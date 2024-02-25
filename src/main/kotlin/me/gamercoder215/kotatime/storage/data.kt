@@ -40,6 +40,8 @@ object WUser {
 object TimeSinceToday {
     var decimal = "0.0"
     var is_up_to_date = true
+    var text = "0 hrs, 0 mins"
+    var total_seconds = 0.0
 }
 
 // WakaTime User Data (Classes)
