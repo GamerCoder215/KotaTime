@@ -8,6 +8,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import io.kanro.compose.jetbrains.expui.control.Label
 import io.kanro.compose.jetbrains.expui.control.ToolBarActionButtonColors
@@ -16,6 +17,7 @@ import io.kanro.compose.jetbrains.expui.theme.LightTheme
 import me.gamercoder215.kotatime.recompose
 import me.gamercoder215.kotatime.storage.StorageManager.saveSettings
 import me.gamercoder215.kotatime.storage.StorageManager.settings
+import me.gamercoder215.kotatime.util.isSupported
 
 var darkMode: Boolean
     get() {
@@ -23,6 +25,30 @@ var darkMode: Boolean
     }
     set(value) {
         settings["dark_mode"] = value.toString()
+        saveSettings()
+        recompose()
+    }
+
+var lang: String
+    get() {
+        val lang = settings["lang"]
+        if (lang == null) {
+            val lang0 = System.getProperty("user.language")
+            if (isSupported(lang0)) {
+                settings["lang"] = lang0
+                saveSettings()
+                return lang0
+            } else {
+                settings["lang"] = "en"
+                saveSettings()
+                return "en"
+            }
+        }
+
+        return settings["lang"] ?: System.getProperty("user.language")
+    }
+    set(value) {
+        settings["lang"] = value
         saveSettings()
         recompose()
     }
@@ -77,6 +103,9 @@ val font = FontFamily(
 
 const val TEXT_SIZE = 11
 const val H1_TEXT_SIZE = 36
+const val H2_TEXT_SIZE = 24
+const val H3_TEXT_SIZE = 18
+const val H4_TEXT_SIZE = 8
 
 // Colors
 
@@ -104,12 +133,24 @@ val TOOLBAR_BUTTON_COLORS: ToolBarActionButtonColors
 // Functions
 
 @Composable
-fun H1(text: String, modifier: Modifier = Modifier, style: TextStyle = TextStyle.Default) {
+fun Text(text: String, fontSize: TextUnit = TEXT_SIZE.sp, modifier: Modifier = Modifier, style: TextStyle = TextStyle.Default) {
     Label(text,
         modifier = modifier,
         color = if (darkMode) Color(DARK_TEXT.alpha) else Color(LIGHT_TEXT.alpha),
-        fontSize = H1_TEXT_SIZE.sp,
+        fontSize = fontSize,
         fontFamily = font,
         style = style
     )
 }
+
+@Composable
+fun H1(text: String, modifier: Modifier = Modifier, style: TextStyle = TextStyle.Default) = Text(text, H1_TEXT_SIZE.sp, modifier, style)
+
+@Composable
+fun H2(text: String, modifier: Modifier = Modifier, style: TextStyle = TextStyle.Default) = Text(text, H2_TEXT_SIZE.sp, modifier, style)
+
+@Composable
+fun H3(text: String, modifier: Modifier = Modifier, style: TextStyle = TextStyle.Default) = Text(text, H3_TEXT_SIZE.sp, modifier, style)
+
+@Composable
+fun H4(text: String, modifier: Modifier = Modifier, style: TextStyle = TextStyle.Default) = Text(text, H4_TEXT_SIZE.sp, modifier, style)
