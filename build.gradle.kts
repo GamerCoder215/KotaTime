@@ -63,7 +63,7 @@ tasks {
     register("release", Zip::class) {
         dependsOn("createReleaseDistributable")
 
-        from("${layout.buildDirectory.get()}/compose/binaries/main-release/app/")
+        from("${layout.buildDirectory.get()}/compose/binaries/main-release/app/KotaTime/")
         archiveFileName.set("KotaTime-$version-$os.zip")
     }
 }
