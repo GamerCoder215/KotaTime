@@ -12,9 +12,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import io.kanro.compose.jetbrains.expui.control.Label
 import io.kanro.compose.jetbrains.expui.control.ToolBarActionButton
 import me.gamercoder215.kotatime.GITHUB_URL
 import me.gamercoder215.kotatime.WAKATIME_URL
+import me.gamercoder215.kotatime.storage.TimeSinceToday
 import me.gamercoder215.kotatime.storage.WUser
 import me.gamercoder215.kotatime.ui.*
 import java.awt.Desktop
@@ -22,7 +24,7 @@ import java.net.URI
 
 @Composable
 fun BoxScope.user() {
-
+    H1(TimeSinceToday.text, Modifier.align(Alignment.TopCenter))
 }
 
 @Composable
@@ -47,6 +49,7 @@ fun BoxScope.toolbar() {
         Modifier.fillMaxHeight()
             .sizeIn(minWidth = 48.dp, maxWidth = 64.dp)
             .size(10.vh)
+            .background(if (darkMode) DARK_BACKGROUND_2 else LIGHT_BACKGROUND_2)
             .padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(1.5.vh),
         horizontalAlignment = Alignment.CenterHorizontally
