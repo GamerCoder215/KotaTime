@@ -53,10 +53,8 @@ val Number.vh: Dp
 val Number.vw: Dp
     get() = (window.width * (this.toFloat() / 100F)).dp
 
-val Number.withAlpha: Long
-    get() {
-        return toLong() or 0xFF000000
-    }
+val Number.alpha: Long
+    get() = toLong() or 0xFF000000
 
 val String.asImage: ImageBitmap
     get() {
@@ -64,4 +62,7 @@ val String.asImage: ImageBitmap
         return Image.makeFromEncoded(stream.readBytes()).toComposeImageBitmap()
     }
 
-fun Modifier.background(value: Number, shape: Shape = RectangleShape) = background(Color(value.withAlpha), shape)
+val Number.withComma: String
+    get() = "%,d".format(this)
+
+fun Modifier.background(value: Number, shape: Shape = RectangleShape) = background(Color(value.alpha), shape)
