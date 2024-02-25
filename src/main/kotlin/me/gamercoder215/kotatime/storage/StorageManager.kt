@@ -126,7 +126,7 @@ object StorageManager {
         }
 
         // Stats
-        val stats = File(folder, "stats")
+        val stats = File(user, "stats")
         if (!stats.exists()) stats.mkdirs()
 
         for ((time, stat) in loadedStats) {

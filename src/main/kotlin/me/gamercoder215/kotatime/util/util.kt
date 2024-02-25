@@ -60,14 +60,14 @@ fun Field.load(instance: Any?, value: JsonElement) {
 }
 
 fun <T> File.serialize(obj: T) {
-    val oos = ObjectOutputStream(BufferedOutputStream(outputStream()))
+    val oos = ObjectOutputStream(outputStream())
     oos.writeObject(obj)
     oos.close()
 }
 
 @Suppress("unchecked_cast")
 fun <T> File.deserialize(): T? {
-    val ois = ObjectInputStream(BufferedInputStream(inputStream()))
+    val ois = ObjectInputStream(inputStream())
     val obj = ois.readObject()
     ois.close()
     return obj as? T
@@ -84,7 +84,7 @@ val String.asFileData: ByteArray
     get() = File(this).readBytes()
 
 fun Any.toJson(): JsonObject = buildJsonObject {
-    for (field in this::class.java.declaredFields.filter { !ReflectionModifier.isFinal(it.modifiers) }.onEach { it.isAccessible = true }) {
+    for (field in this@toJson::class.java.declaredFields.filter { !ReflectionModifier.isFinal(it.modifiers) }.onEach { it.isAccessible = true }) {
         val value = field[null]
         if (value == null) {
             put(field.name, JsonNull)

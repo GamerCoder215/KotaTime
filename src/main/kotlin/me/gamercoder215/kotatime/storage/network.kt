@@ -51,9 +51,9 @@ fun getStatFilters(start: Date, now: Date = Date()): List<String> {
     val filters = mutableListOf<String>()
 
     val startYear = (start.time / 31536000000) + 1970
-    val startMonth = ((start.time / 2628000000) % 12) + 1
+    val startMonth = ((start.time / 2628000000) % 12)
     val currentYear = (now.time / 31536000000) + 1970
-    val currentMonth = ((now.time / 2628000000) % 12) + 1
+    val currentMonth = ((now.time / 2628000000) % 12)
 
     var year = startYear
     var month = startMonth
@@ -165,8 +165,6 @@ suspend fun loadFromNetwork() = withContext(Dispatchers.IO) {
     }
 
     coroutineScope {
-        val stats = mutableMapOf<String, Stats>()
-
         val times = listOf(
             "last_7_days",
             "last_30_days",
@@ -187,12 +185,10 @@ suspend fun loadFromNetwork() = withContext(Dispatchers.IO) {
                 val languages = loadArray(baseUrl = "https://wakatime.com/api/v1/users/current/stats/$time", clazz = Stat::class.java, entryPoint = "data.languages")
                 val os = loadArray(baseUrl = "https://wakatime.com/api/v1/users/current/stats/$time", clazz = Stat::class.java, entryPoint = "data.operating_systems")
 
-                stats[time] = Stats(info, editors, categories, languages, os)
+                StorageManager.loadedStats[time] = Stats(info, editors, categories, languages, os)
 
                 info("Loaded Stats for ${WUser.username} in '$time'")
             }
-
-        StorageManager.loadedStats.putAll(stats)
     }
 }
 
@@ -210,7 +206,7 @@ private fun json(
     )
 
     val body = res.body()
-    debug("Request to $uri returned ${res.statusCode()}, size ${body.length}")
+    debug("Request to '$uri' returned ${res.statusCode()}, size ${body.length}")
 
     if (res.statusCode() == 302 || res.statusCode() == 429)
         throw IllegalStateException("We are currently making too many API Requests. Wait about 5 minutes then re-open the application.")
@@ -253,7 +249,7 @@ private fun <T> loadArray(
 
     if (entryPoint.contains("."))
         for (i in entryPoint.split(".")) {
-            val value = current[i] ?: throw SerializationException("Invalid entry point (parent is null): $entryPoint")
+            val value = current[i] ?: throw SerializationException("Invalid entry point (location doesn't exist): $entryPoint")
             if (value is JsonArray) {
                 entry = value
                 break
