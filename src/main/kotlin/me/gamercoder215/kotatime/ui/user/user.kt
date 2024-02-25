@@ -24,7 +24,10 @@ import java.net.URI
 
 @Composable
 fun BoxScope.user() {
-    H1(TimeSinceToday.text, Modifier.align(Alignment.TopCenter))
+    H1(TimeSinceToday.text, Modifier
+        .padding(top = 8.dp)
+        .align(Alignment.TopCenter)
+    )
 }
 
 @Composable
