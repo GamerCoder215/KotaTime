@@ -80,4 +80,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kotatime-${{ matrix.os }}
-          path: build/distributions/*.zip
+          path: build/release/*.zip
