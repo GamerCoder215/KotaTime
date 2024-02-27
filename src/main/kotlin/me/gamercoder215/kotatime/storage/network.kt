@@ -50,10 +50,13 @@ val IS_ONLINE: Boolean
 fun getStatFilters(start: Date, now: Date = Date()): List<String> {
     val filters = mutableListOf<String>()
 
-    val startYear = (start.time / 31536000000) + 1970
-    val startMonth = ((start.time / 2628000000) % 12)
-    val currentYear = (now.time / 31536000000) + 1970
-    val currentMonth = ((now.time / 2628000000) % 12)
+    val start0 = Calendar.Builder().setInstant(start).build()
+    val now0 = Calendar.Builder().setInstant(now).build()
+
+    val startYear = start0[Calendar.YEAR]
+    val startMonth = start0[Calendar.MONTH] + 1
+    val currentYear = now0[Calendar.YEAR]
+    val currentMonth = now0[Calendar.MONTH] + 1
 
     var year = startYear
     var month = startMonth
@@ -61,7 +64,7 @@ fun getStatFilters(start: Date, now: Date = Date()): List<String> {
     while (year < currentYear || (year == currentYear && month <= currentMonth)) {
         filters.add("$year-${String.format("%02d", month)}")
 
-        if (month == 12L) {
+        if (month == 12) {
             year++
             month = 1
         } else {

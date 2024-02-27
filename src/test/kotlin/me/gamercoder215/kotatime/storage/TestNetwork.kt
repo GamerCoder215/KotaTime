@@ -16,7 +16,7 @@ class TestNetwork {
             "2021-03",
             "2021-04",
         )
-        Assertions.assertEquals(list1, getStatFilters("2021-01-01T00:00:00Z".asDate, "2021-04-05T00:00:00Z".asDate))
+        Assertions.assertEquals(list1, getStatFilters("2021-01-02T00:00:00Z".asDate, "2021-04-05T00:00:00Z".asDate))
 
         val list2 = listOf(
             "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12",
@@ -41,6 +41,12 @@ class TestNetwork {
             "2022-07"
         )
         Assertions.assertEquals(list4, getStatFilters("2022-05-01T13:17:59Z".asDate, "2022-07-11T23:59:59Z".asDate))
+
+        val list5 = listOf(
+            "2023-01",
+            "2023-02"
+        )
+        Assertions.assertEquals(list5, getStatFilters("2023-01-31T23:59:59Z".asDate, "2023-02-28T23:59:59Z".asDate))
     }
 
 }
