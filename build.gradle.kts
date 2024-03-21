@@ -3,7 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("jvm") version "1.9.21"
-    id("org.jetbrains.compose") version "1.6.0"
+    id("org.jetbrains.compose") version "1.6.1"
 }
 
 group = "me.gamercoder215.kotatime"
