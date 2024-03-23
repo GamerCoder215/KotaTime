@@ -12,6 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.platform.ResourceFont
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.kanro.compose.jetbrains.expui.control.ProgressBar
@@ -66,3 +68,47 @@ val Number.withComma: String
     get() = "%,d".format(this)
 
 fun Modifier.background(value: Number, shape: Shape = RectangleShape) = background(Color(value.alpha), shape)
+
+fun Font.awt(): java.awt.Font {
+    if (this !is ResourceFont) throw IllegalArgumentException("Font is not a ResourceFont")
+    val input = javaClass.getResourceAsStream(this.name)
+
+    var style = 0
+    if (this.style == FontStyle.Italic) style = style or java.awt.Font.ITALIC
+    if (this.weight == FontWeight.Bold) style = style or java.awt.Font.BOLD
+
+    return java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, input).deriveFont(style)
+}
+
+fun Font.awt(size: Float): java.awt.Font = awt().deriveFont(size)
+fun Font.awt(size: Int): java.awt.Font = awt(size.toFloat())
+
+val FontFamily.normal: Font
+    get() {
+        if (this !is FontListFontFamily) throw IllegalArgumentException("FontFamily is not a FontListFontFamily")
+        return this.fonts.first { it.style == FontStyle.Normal && it.weight == FontWeight.Normal }
+    }
+
+val FontFamily.bold: Font
+    get() {
+        if (this !is FontListFontFamily) throw IllegalArgumentException("FontFamily is not a FontListFontFamily")
+        return this.fonts.first { it.style == FontStyle.Normal && it.weight == FontWeight.Bold }
+    }
+
+val FontFamily.italic: Font
+    get() {
+        if (this !is FontListFontFamily) throw IllegalArgumentException("FontFamily is not a FontListFontFamily")
+        return this.fonts.first { it.style == FontStyle.Italic && it.weight == FontWeight.Normal }
+    }
+
+val FontFamily.boldItalic: Font
+    get() {
+        if (this !is FontListFontFamily) throw IllegalArgumentException("FontFamily is not a FontListFontFamily")
+        return this.fonts.first { it.style == FontStyle.Italic && it.weight == FontWeight.Bold }
+    }
+
+val FontFamily.light: Font
+    get() {
+        if (this !is FontListFontFamily) throw IllegalArgumentException("FontFamily is not a FontListFontFamily")
+        return this.fonts.first { it.style == FontStyle.Normal && it.weight == FontWeight.Light }
+    }
